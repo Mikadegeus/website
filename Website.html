@@ -136,7 +136,7 @@
             text-align: center;
             border-radius: 15px; /* Rounded card */
             box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
         .service-item:hover {
             transform: translateY(-10px);
@@ -218,7 +218,7 @@
     </style>
 </head>
 <body>
-    <header>
+    <header id="main-header"></header>
         <div class="container header-container">
             <div class="logo">YourCompany</div>
             <nav>
@@ -227,8 +227,37 @@
                 <a href="#about">About</a>
                 <a href="#contact">Contact</a>
             </nav>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </div>
+                </label>
+            </div>
         </div>
     </header>
+
+    <!-- Chatbot Popup -->
+    <div class="chatbot-toggle" onclick="toggleChatbot()">
+        <i class="fas fa-comments"></i>
+    </div>
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header">
+            <h3>Chat Support</h3>
+            <button onclick="toggleChatbot()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="message bot">
+                Hello! How can I help you today?
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Type your message...">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <main>
         <section id="home" class="hero">
@@ -252,11 +281,151 @@
                     <h3>Digital Marketing</h3>
                     <p>Boosting your online presence and engagement through targeted strategies.</p>
                 </div>
-                <div class="service-item fade-in">
-                    <i class="fas fa-pen-nib"></i>
+                <!-- Advanced animated service cards (add lottie-player script before </body>: 
+                <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>) -->
+                <div class="service-item fade-in" data-delay="100"></div>
+                    <lottie-player src="https://assets7.lottiefiles.com/packages/lf20_m3ixidnq.json" background="transparent" speed="1" style="width:120px;height:120px;margin:0 auto 1rem;" loop autoplay aria-label="UI/UX animation"></lottie-player>
                     <h3>UI/UX Design</h3>
-                    <p>Designing intuitive and beautiful user interfaces for the best user experience.</p>
+                    <p>Designing intuitive, accessible and beautiful user experiences.</p>
                 </div>
+                <div class="service-item fade-in" data-delay="200">
+                    <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_kyu7xb1v.json" background="transparent" speed="1" style="width:120px;height:120px;margin:0 auto 1rem;" loop autoplay aria-label="Cloud & DevOps animation"></lottie-player>
+                    <h3>Cloud & DevOps</h3>
+                    <p>Automated CI/CD pipelines, scalable cloud architecture and observability.</p>
+                </div>
+                <div class="service-item fade-in" data-delay="300">
+                    <svg width="120" height="120" viewBox="0 0 120 120" style="margin:0 auto 1rem;display:block;">
+                        <defs>
+                            <linearGradient id="gradShield" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#0056b3"/>
+                                <stop offset="100%" stop-color="#00b3d6"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M60 10l38 14v26c0 28-17 48-38 60-21-12-38-32-38-60V24z" fill="url(#gradShield)">
+                            <animate attributeName="d" dur="4s" repeatCount="indefinite"
+                                values="M60 10l38 14v26c0 28-17 48-38 60-21-12-38-32-38-60V24z;
+                                        M60 12l36 16v24c0 30-16 50-36 60-20-10-36-30-36-60V28z;
+                                        M60 10l38 14v26c0 28-17 48-38 60-21-12-38-32-38-60V24z"/>
+                        </path>
+                        <script>
+/* Basic interactive chatbot logic */
+(function () {
+    const box = document.getElementById('chatbot');
+    const messagesEl = document.getElementById('chatbot-messages');
+    const inputEl = document.getElementById('chatbot-input');
+
+    if (!box || !messagesEl || !inputEl) return;
+
+    window.toggleChatbot = function () {
+        box.classList.toggle('open');
+        if (box.classList.contains('open')) inputEl.focus();
+    };
+
+    function appendMessage(text, sender) {
+        const div = document.createElement('div');
+        div.className = 'message ' + sender;
+        div.textContent = text;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    const faq = [
+        { pattern: /^(hi|hey|hello)\b/i, reply: 'Hello! How can I assist you today?' },
+        { pattern: /services?|offer|do you do/i, reply: 'We offer Web Dev, Digital Marketing, UI/UX, Cloud & DevOps, and Cybersecurity Audits.' },
+        { pattern: /contact|email|phone/i, reply: 'You can reach us at info@yourcompany.com or (123) 456-7890.' },
+        { pattern: /price|cost|rate|pricing/i, reply: 'Pricing depends on scope. Describe your project and I can note the details for our team.' },
+        { pattern: /security|cyber|audit/i, reply: 'Our audits cover threat modeling, hardening, monitoring, and compliance guidance.' },
+        { pattern: /help|support|assist/i, reply: 'Sure—tell me what you need help with.' },
+        { pattern: /thanks|thank you/i, reply: 'Glad to help! Anything else?' }
+    ];
+
+    function generateReply(user) {
+        user = user.trim();
+        if (!user) return 'Please type something so I can help.';
+        for (const f of faq) {
+            if (f.pattern.test(user)) return f.reply;
+        }
+        return 'I am not sure about that yet. Could you rephrase or ask about services, pricing, or contact info?';
+    }
+
+    window.sendMessage = function () {
+        const text = inputEl.value;
+        if (!text.trim()) return;
+        appendMessage(text, 'user');
+        inputEl.value = '';
+        setTimeout(() => {
+            const reply = generateReply(text);
+            appendMessage(reply, 'bot');
+        }, 400);
+    };
+
+    inputEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            window.sendMessage();
+        }
+    });
+
+    /* Minimal styling injection if not present */
+    if (!document.getElementById('chatbot-inline-style')) {
+        const style = document.createElement('style');
+        style.id = 'chatbot-inline-style';
+        style.textContent = `
+        .chatbot-toggle{
+            position:fixed;bottom:20px;right:20px;background:#0056b3;color:#fff;
+            width:56px;height:56px;border-radius:50%;display:flex;align-items:center;
+            justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:1200;
+            transition:.3s;
+        }
+        .chatbot-toggle:hover{background:#00418a}
+        .chatbot-container{
+            position:fixed;bottom:90px;right:20px;width:320px;max-height:460px;
+            background:#ffffff;border:1px solid #e3e6ea;border-radius:14px;display:flex;
+            flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.15);
+            transform:translateY(20px);opacity:0;pointer-events:none;transition:.3s;z-index:1200;
+            overflow:hidden;
+        }
+        .chatbot-container.open{transform:translateY(0);opacity:1;pointer-events:auto;}
+        .chatbot-header{
+            background:#0056b3;color:#fff;padding:.9rem 1rem;display:flex;
+            align-items:center;justify-content:space-between;
+        }
+        .chatbot-header h3{margin:0;font-size:1rem;font-weight:600}
+        .chatbot-header button{background:transparent;border:none;color:#fff;cursor:pointer;font-size:1rem}
+        .chatbot-messages{
+            flex:1;padding:.9rem;overflow-y:auto;font-size:.85rem;background:#f8f9fa;
+        }
+        .chatbot-messages .message{
+            padding:.55rem .7rem;margin-bottom:.55rem;border-radius:10px;line-height:1.3;
+            max-width:85%;word-wrap:break-word;
+        }
+        .chatbot-messages .message.bot{background:#e6f0fb;color:#0b3d6d;}
+        .chatbot-messages .message.user{background:#0056b3;color:#fff;margin-left:auto;}
+        .chatbot-input{display:flex;border-top:1px solid #e3e6ea;}
+        .chatbot-input input{
+            flex:1;border:none;padding:.7rem .75rem;font-size:.85rem;font-family:inherit;
+            outline:none;
+        }
+        .chatbot-input button{
+            background:#0056b3;border:none;color:#fff;padding:0 .9rem;cursor:pointer;
+            transition:.25s;
+        }
+        .chatbot-input button:hover{background:#00418a}
+        `;
+        document.head.appendChild(style);
+    }
+})();
+                        </script>
+                        <circle cx="60" cy="55" r="18" fill="#fff" opacity="0.15">
+                            <animate attributeName="r" values="14;20;14" dur="3s" repeatCount="indefinite"/>
+                        </circle>
+                        <path d="M53 55l5 6 11-13" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+                            <animate attributeName="stroke-dasharray" from="0 60" to="60 0" dur="2s" repeatCount="indefinite"/>
+                        </path>
+                    </svg>
+                    <h3>Cybersecurity Audits</h3>
+                    <p>Proactive threat modeling, hardening and continuous security monitoring.</p>
+                </div></div>
             </div>
         </section>
 
@@ -280,8 +449,18 @@
     <footer>
         <div class="container footer-container">
             <div class="footer-col">
-                <h4>YourCompany</h4>
-                <p>Delivering innovative and high-quality solutions to help your business grow and succeed in the digital age.</p>
+                <h4>TechVision</h4>
+                <p class="footer-desc">Empowering businesses through innovative digital solutions. Join over <span class="counter" data-target="1000">0</span> satisfied clients worldwide.</p>
+                <div class="footer-stats">
+                    <div class="stat-item">
+                        <span class="counter" data-target="150">0</span>+
+                        <small>Projects</small>
+                    </div>
+                    <div class="stat-item">
+                        <span class="counter" data-target="98">0</span>%
+                        <small>Satisfaction</small>
+                    </div>
+                </div>
             </div>
             <div class="footer-col">
                 <h4>Quick Links</h4>
@@ -301,7 +480,7 @@
             </div>
         </div>
         <div class="container footer-bottom">
-            <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+            <div>&copy; 2024 Your Company Name. All rights reserved.</div>
         </div>
     </footer>
 
